@@ -7,8 +7,12 @@ class TheoryLocalDatasource {
   Future<List<Map<String, dynamic>>> getLessons() async {
     // Simulating async data fetch
     await Future.delayed(const Duration(milliseconds: 100));
-    return _lessons;
+    return lessons;
   }
+
+  /// Exposed as a static getter so the home screen can access lessons
+  /// synchronously without going through the async repository chain.
+  static List<Map<String, dynamic>> get lessons => _lessons;
 
   static const List<Map<String, dynamic>> _lessons = [
     {
@@ -25,7 +29,7 @@ class TheoryLocalDatasource {
       'category': 'Scales',
       'content':
           'Major scales sound bright and happy. Minor scales sound darker and more emotional. '
-          'The difference lies in the 3rd, 6th, and 7th degrees.',
+              'The difference lies in the 3rd, 6th, and 7th degrees.',
       'examples': [
         'C Major: C D E F G A B C',
         'A Natural Minor: A B C D E F G A',
@@ -37,7 +41,7 @@ class TheoryLocalDatasource {
       'category': 'Progressions',
       'content':
           'A chord progression is a sequence of chords. Roman numerals (I, IV, V, vi) describe chord '
-          'relationships within a key regardless of what key you\'re in.',
+              'relationships within a key regardless of what key you\'re in.',
       'examples': [
         'I - V - vi - IV (C - G - Am - F)',
         'ii - V - I (jazz standard)',
@@ -49,7 +53,7 @@ class TheoryLocalDatasource {
       'category': 'Theory',
       'content':
           'An interval is the distance between two notes. Knowing intervals helps you build '
-          'any chord from scratch.',
+              'any chord from scratch.',
       'examples': [
         'Unison, Minor 2nd, Major 2nd, Minor 3rd...',
         'Perfect 5th = 7 semitones',
@@ -61,7 +65,7 @@ class TheoryLocalDatasource {
       'category': 'Advanced',
       'content':
           'Modes are scales derived from the major scale starting on different degrees. '
-          'Dorian is used widely in jazz and funk. Phrygian has a dark, Spanish character.',
+              'Dorian is used widely in jazz and funk. Phrygian has a dark, Spanish character.',
       'examples': ['Dorian: D E F G A B C D', 'Phrygian: E F G A B C D E'],
     },
   ];
