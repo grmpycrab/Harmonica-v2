@@ -10,4 +10,5 @@ class AppConstants {
   static const String routeLearn = '/learn';
   static const String routeLessonDetail = '/learn/detail';
   static const String routeSettings = '/settings';
+  static const String routePianoRoll = '/piano-roll';
 }

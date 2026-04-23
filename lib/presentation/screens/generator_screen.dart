@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../core/constants/app_constants.dart';
 import '../../core/utils/app_spacing.dart';
 import '../viewmodels/progression_viewmodel.dart';
 import '../widgets/chord_chip.dart';
@@ -192,6 +194,17 @@ class _ProgressionResult extends StatelessWidget {
                 ),
               ),
             ],
+            AppSpacing.gapMd,
+            const Divider(height: 1),
+            AppSpacing.gapSm,
+            OutlinedButton.icon(
+              icon: const Icon(Icons.piano_outlined, size: 16),
+              label: const Text('View in Piano Roll'),
+              onPressed: () => context.push(AppConstants.routePianoRoll),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(40),
+              ),
+            ),
           ],
         ),
       ),

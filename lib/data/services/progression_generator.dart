@@ -123,6 +123,14 @@ class ProgressionGenerator {
         ChordDegree.i when _random.nextDouble() < 0.35 => ChordDegree.vi,
         // V → VII: leading-tone substitution, only 25% of the time
         ChordDegree.v when _random.nextDouble() < 0.25 => ChordDegree.vii,
+        // VI → IV: relative substitution
+        ChordDegree.vi when _random.nextDouble() < 0.4 => ChordDegree.iv,
+        // III → I: mediant to tonic
+        ChordDegree.iii when _random.nextDouble() < 0.3 => ChordDegree.i,
+        // II → IV: pre-dominant swap
+        ChordDegree.ii when _random.nextDouble() < 0.3 => ChordDegree.iv,
+        // VII → V: tension interchange
+        ChordDegree.vii when _random.nextDouble() < 0.3 => ChordDegree.v,
         _ => degree,
       };
 }

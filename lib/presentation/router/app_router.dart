@@ -5,6 +5,7 @@ import '../screens/generator_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/inspiration_screen.dart';
 import '../screens/learn_screen.dart';
+import '../screens/piano_roll_screen.dart';
 import '../screens/settings_screen.dart';
 import '../shell/app_shell.dart';
 
@@ -38,6 +39,11 @@ final appRouter = GoRouter(
           builder: (_, __) => const SettingsScreen(),
         ),
       ],
+    ),
+    // Piano roll is outside the shell — full-screen, no NavigationBar.
+    GoRoute(
+      path: AppConstants.routePianoRoll,
+      builder: (_, __) => const PianoRollScreen(),
     ),
   ],
 );
