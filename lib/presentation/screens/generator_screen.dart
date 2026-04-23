@@ -111,7 +111,7 @@ class _OptionalFields extends StatelessWidget {
                     borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                 ),
-                value: null,
+                initialValue: null,
                 items: [
                   const DropdownMenuItem(value: null, child: Text('None')),
                   ...GenreType.values.map(

@@ -33,9 +33,9 @@ class AppShell extends StatelessWidget {
     ),
     _TabDestination(
       path: AppConstants.routeInspiration,
-      icon: Icons.shuffle_outlined,
-      activeIcon: Icons.shuffle,
-      label: 'Inspire',
+      icon: Icons.donut_large_outlined,
+      activeIcon: Icons.donut_large,
+      label: 'Circle',
     ),
     _TabDestination(
       path: AppConstants.routeLearn,

@@ -1,5 +1,3 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 part of 'progression_viewmodel.dart';
 
 // **************************************************************************
@@ -7,7 +5,7 @@ part of 'progression_viewmodel.dart';
 // **************************************************************************
 
 String _$progressionViewModelHash() =>
-    r'bb4f4c2538c5e08b39341144540f98d744f0955b';
+    r'e21074ed201c11014507aec7a73e8fa5e2e45918';
 
 /// See also [ProgressionViewModel].
 @ProviderFor(ProgressionViewModel)

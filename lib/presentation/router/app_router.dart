@@ -1,9 +1,9 @@
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_constants.dart';
+import '../screens/circle_of_fifths_screen.dart';
 import '../screens/generator_screen.dart';
 import '../screens/home_screen.dart';
-import '../screens/inspiration_screen.dart';
 import '../screens/learn_screen.dart';
 import '../screens/piano_roll_screen.dart';
 import '../screens/settings_screen.dart';
@@ -28,7 +28,7 @@ final appRouter = GoRouter(
         ),
         GoRoute(
           path: AppConstants.routeInspiration,
-          builder: (_, __) => const InspirationScreen(),
+          builder: (_, __) => const CircleOfFifthsScreen(),
         ),
         GoRoute(
           path: AppConstants.routeLearn,
