@@ -2,22 +2,36 @@ import 'dart:math';
 
 import '../../domain/entities/chord_degree.dart';
 import '../../domain/entities/emotion_type.dart';
+import '../../domain/entities/genre_type.dart';
 import '../../domain/entities/progression.dart';
+import '../../domain/entities/scale_type.dart';
 import 'emotion_catalog.dart';
+import 'genre_catalog.dart';
 import 'scale_mapper.dart';
 
 /// Core service that generates musically meaningful [Progression]s.
 ///
-/// Generation flow:
-///   EmotionType
-///     → EmotionProfile  (rules: scales, patterns, tension, variation)
-///     → Pattern selection  (A: weighted random)
-///     → Variation pass     (D: chord substitutions)
-///     → Scale resolution   (C: tension-aware degree → chord mapping)
+/// **Generation flow (emotion only):**
+///   EmotionType → EmotionProfile → pattern → variation → scale → chords
+///
+/// **Generation flow (emotion + genre):**
+///   EmotionType + GenreType
+///     → EmotionProfile + GenreProfile
+///     → Profile merge  (scale pool, pattern pool, tension, variation, ninths)
+///     → Weighted pattern selection
+///     → Variation pass (diatonic substitutions)
+///     → Scale resolution (tension / ninth -aware degree → chord mapping)
 ///     → Progression
 ///
-/// All music-theory decisions live here or in [EmotionCatalog]/[ScaleMapper].
-/// Zero Flutter/Riverpod dependencies — fully unit-testable.
+/// **Merge contract:**
+/// * Scale pool  — intersection of genre and emotion scales (emotion fallback)
+/// * Pattern pool — emotion patterns + genre patterns in a shared weighted pool
+///                  weighted by [GenreProfile.repetitionFactor]
+/// * Tension     — `emotionTension × (1 − blend) + genreTension × blend`
+/// * Variation   — 70 % emotion / 30 % genre
+/// * 9th chords  — activated when [GenreProfile.extensionLevel] > 0.5
+///
+/// Zero Flutter / Riverpod dependencies — fully unit-testable.
 class ProgressionGenerator {
   ProgressionGenerator({required ScaleMapper scaleMapper})
       : _scaleMapper = scaleMapper,
@@ -26,43 +40,107 @@ class ProgressionGenerator {
   final ScaleMapper _scaleMapper;
   final Random _random;
 
-  /// Generates a [Progression] governed by the musical rules for [emotion].
-  Progression generate({required EmotionType emotion, String genre = ''}) {
-    final profile = EmotionCatalog.profileFor(emotion);
+  /// Generates a [Progression] governed by [emotion] and optionally shaped
+  /// by [genre]. When [genre] is null the output is identical to the
+  /// emotion-only behaviour.
+  Progression generate({
+    required EmotionType emotion,
+    GenreType? genre,
+  }) {
+    final emotionProfile = EmotionCatalog.profileFor(emotion);
+
+    // ── Merge profiles when a genre is active ──────────────────────────────
+    final List<ChordDegree> Function() selectPattern;
+    final double effectiveTension;
+    final double effectiveVariation;
+    final List<ScaleType> scalePool;
+    bool withNinth = false;
+
+    if (genre != null) {
+      final genreProfile = GenreCatalog.profileFor(genre);
+
+      // Scale pool: genre ∩ emotion; fallback to emotion if intersection empty
+      final intersection = genreProfile.preferredScales
+          .where((s) => emotionProfile.allowedScales.contains(s))
+          .toList();
+      scalePool =
+          intersection.isNotEmpty ? intersection : emotionProfile.allowedScales;
+
+      // Pattern pool: emotion patterns weighted down by genre's repFactor,
+      // genre patterns weighted up — higher repFactor → genre dominates.
+      final eWeight = 1.0 - genreProfile.repetitionFactor * 0.5;
+      final gWeight = genreProfile.repetitionFactor * 0.5;
+      final combinedPatterns = [
+        ...emotionProfile.preferredPatterns,
+        ...genreProfile.progressionPatterns,
+      ];
+      final combinedWeights = [
+        ...emotionProfile.patternWeights.map((w) => w * eWeight),
+        ...genreProfile.patternWeights.map((w) => w * gWeight),
+      ];
+      selectPattern =
+          () => _selectWeightedPattern(combinedPatterns, combinedWeights);
+
+      // Tension: genre pulls the emotion's value toward its own bias
+      effectiveTension =
+          emotionProfile.tensionLevel * (1.0 - genreProfile.tensionBlend) +
+              genreProfile.tensionBias * genreProfile.tensionBlend;
+
+      // Variation: light genre influence (70 % emotion, 30 % genre)
+      effectiveVariation =
+          emotionProfile.variation * 0.7 + genreProfile.variationBias * 0.3;
+
+      // 9th chords: genre-driven; activates when extensionLevel > 0.5
+      withNinth = genreProfile.extensionLevel > 0.5 &&
+          _random.nextDouble() < genreProfile.extensionLevel;
+    } else {
+      scalePool = emotionProfile.allowedScales;
+      selectPattern = () => _selectWeightedPattern(
+            emotionProfile.preferredPatterns,
+            emotionProfile.patternWeights,
+          );
+      effectiveTension = emotionProfile.tensionLevel;
+      effectiveVariation = emotionProfile.variation;
+    }
 
     // A — Weighted pattern selection
-    final pattern = _selectWeightedPattern(
-      profile.preferredPatterns,
-      profile.patternWeights,
-    );
+    final pattern = selectPattern();
 
     // D — Variation: apply diatonic chord substitutions
-    final varied = _applyVariation(pattern, profile.variation);
+    final varied = _applyVariation(pattern, effectiveVariation);
 
     // Pick scale for this generation run
-    final scale =
-        profile.allowedScales[_random.nextInt(profile.allowedScales.length)];
+    final scale = scalePool[_random.nextInt(scalePool.length)];
 
     // C — Tension control: decide once per progression whether to use
-    //     tension variants (e.g. G→G7, E→E7) on applicable degrees.
-    //     Probability scales with tensionLevel above 0.5 threshold.
-    final useTension = profile.tensionLevel > 0.5 &&
-        _random.nextDouble() < (profile.tensionLevel - 0.5) * 2.0;
+    //     7th chord variants. 9th chords (when active) include the 7th,
+    //     so tension is suppressed to avoid conflicts.
+    final useTension = !withNinth &&
+        effectiveTension > 0.5 &&
+        _random.nextDouble() < (effectiveTension - 0.5) * 2.0;
 
     // Resolve each degree to a concrete chord
     final chords = varied
-        .map((d) => _scaleMapper.resolve(d, scale, withTension: useTension))
+        .map(
+          (d) => _scaleMapper.resolve(
+            d,
+            scale,
+            withTension: useTension,
+            withNinth: withNinth,
+          ),
+        )
         .toList();
 
-    final description =
-        profile.descriptions[_random.nextInt(profile.descriptions.length)];
+    final description = emotionProfile
+        .descriptions[_random.nextInt(emotionProfile.descriptions.length)];
 
     return Progression(
       chords: chords,
       emotion: emotion,
+      genreType: genre,
       description: description,
       key: _scaleMapper.keyLabel(scale),
-      genre: genre,
+      genre: genre?.label ?? '',
     );
   }
 

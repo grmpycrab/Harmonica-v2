@@ -24,8 +24,17 @@ class ScaleMapper {
     ChordDegree degree,
     ScaleType scale, {
     bool withTension = false,
+    bool withNinth = false,
   }) {
     final data = _scales[scale]![degree]!;
+    // 9th chord takes priority — it already includes the 7th as the 4th note
+    if (withNinth && data.ninthVariant != null) {
+      return Chord(
+        name: data.ninthVariant!,
+        notes: data.ninthNotes ?? data.notes,
+        quality: data.ninthQuality ?? data.quality,
+      );
+    }
     if (withTension && data.tensionVariant != null) {
       return Chord(
         name: data.tensionVariant!,
@@ -60,6 +69,7 @@ class ScaleMapper {
     // ── C Major ───────────────────────────────────────────────────────────────
     //   I=C  II=Dm  III=Em  IV=F  V=G  VI=Am  VII=Bdim
     ScaleType.major: {
+      // C major — I(Cmaj9) II(Dm9) III(Em7) IV(Fmaj9) V(G9) VI(Am9) VII(Bdim)
       ChordDegree.i: _ChordData(
         'C',
         ['C', 'E', 'G'],
@@ -67,6 +77,9 @@ class ScaleMapper {
         'Cmaj7',
         ['C', 'E', 'G', 'B'],
         'major7',
+        'Cmaj9',
+        ['C', 'E', 'G', 'B', 'D'],
+        'major9',
       ),
       ChordDegree.ii: _ChordData(
         'Dm',
@@ -75,6 +88,9 @@ class ScaleMapper {
         'Dm7',
         ['D', 'F', 'A', 'C'],
         'minor7',
+        'Dm9',
+        ['D', 'F', 'A', 'C', 'E'],
+        'minor9',
       ),
       ChordDegree.iii: _ChordData(
         'Em',
@@ -91,6 +107,9 @@ class ScaleMapper {
         'Fmaj7',
         ['F', 'A', 'C', 'E'],
         'major7',
+        'Fmaj9',
+        ['F', 'A', 'C', 'E', 'G'],
+        'major9',
       ),
       ChordDegree.v: _ChordData(
         'G',
@@ -99,6 +118,9 @@ class ScaleMapper {
         'G7',
         ['G', 'B', 'D', 'F'],
         'dominant7',
+        'G9',
+        ['G', 'B', 'D', 'F', 'A'],
+        'dominant9',
       ),
       ChordDegree.vi: _ChordData(
         'Am',
@@ -107,12 +129,15 @@ class ScaleMapper {
         'Am7',
         ['A', 'C', 'E', 'G'],
         'minor7',
+        'Am9',
+        ['A', 'C', 'E', 'G', 'B'],
+        'minor9',
       ),
       ChordDegree.vii: _ChordData('Bdim', ['B', 'D', 'F'], 'diminished'),
     },
 
     // ── A Natural Minor ───────────────────────────────────────────────────────
-    //   I=Am  II=Bdim  III=C  IV=Dm  V=Em  VI=F  VII=G
+    //   i=Am(9)  ii=Bdim  iii=C  iv=Dm(9)  v=Em  vi=F  vii=G
     ScaleType.naturalMinor: {
       ChordDegree.i: _ChordData(
         'Am',
@@ -121,6 +146,9 @@ class ScaleMapper {
         'Am7',
         ['A', 'C', 'E', 'G'],
         'minor7',
+        'Am9',
+        ['A', 'C', 'E', 'G', 'B'],
+        'minor9',
       ),
       ChordDegree.ii: _ChordData('Bdim', ['B', 'D', 'F'], 'diminished'),
       ChordDegree.iii: _ChordData(
@@ -138,6 +166,9 @@ class ScaleMapper {
         'Dm7',
         ['D', 'F', 'A', 'C'],
         'minor7',
+        'Dm9',
+        ['D', 'F', 'A', 'C', 'E'],
+        'minor9',
       ),
       // V stays diatonic Em; tension borrows major V from harmonic minor
       ChordDegree.v: _ChordData(
@@ -252,7 +283,7 @@ class ScaleMapper {
 
     // ── C Dorian ──────────────────────────────────────────────────────────────
     //   Scale: C D Eb F G A Bb
-    //   i=Cm  ii=Dm  bIII=Eb  IV=F  v=Gm  vi=Adim  bVII=Bb
+    //   i=Cm(9)  ii=Dm(9)  bIII=Eb  IV=F  v=Gm  vi=Adim  bVII=Bb(9)
     ScaleType.dorianMode: {
       ChordDegree.i: _ChordData(
         'Cm',
@@ -261,6 +292,9 @@ class ScaleMapper {
         'Cm7',
         ['C', 'D#', 'G', 'A#'],
         'minor7',
+        'Cm9',
+        ['C', 'D#', 'G', 'A#', 'D'],
+        'minor9',
       ),
       ChordDegree.ii: _ChordData(
         'Dm',
@@ -269,6 +303,9 @@ class ScaleMapper {
         'Dm7',
         ['D', 'F', 'A', 'C'],
         'minor7',
+        'Dm9',
+        ['D', 'F', 'A', 'C', 'E'],
+        'minor9',
       ),
       ChordDegree.iii: _ChordData('Eb', ['D#', 'G', 'A#'], 'major'),
       ChordDegree.iv: _ChordData(
@@ -288,6 +325,9 @@ class ScaleMapper {
         'Bb7',
         ['A#', 'D', 'F', 'G#'],
         'dominant7',
+        'Bb9',
+        ['A#', 'D', 'F', 'G#', 'C'],
+        'dominant9',
       ),
     },
 
@@ -321,7 +361,7 @@ class ScaleMapper {
 
     // ── C Lydian ──────────────────────────────────────────────────────────────
     //   Scale: C D E F# G A B
-    //   I=C  II=D  iii=Em  #ivdim=F#dim  V=G  vi=Am  viim=Bm
+    //   I=C(9)  II=D(9)  iii=Em  #ivdim=F#dim  V=G  vi=Am(9)  viim=Bm
     ScaleType.lydianMode: {
       ChordDegree.i: _ChordData(
         'C',
@@ -330,6 +370,9 @@ class ScaleMapper {
         'Cmaj7',
         ['C', 'E', 'G', 'B'],
         'major7',
+        'Cmaj9',
+        ['C', 'E', 'G', 'B', 'D'],
+        'major9',
       ),
       // II = major (distinctive Lydian colour — major chord a whole step up)
       ChordDegree.ii: _ChordData(
@@ -339,6 +382,9 @@ class ScaleMapper {
         'Dmaj7',
         ['D', 'F#', 'A', 'C#'],
         'major7',
+        'Dmaj9',
+        ['D', 'F#', 'A', 'C#', 'E'],
+        'major9',
       ),
       ChordDegree.iii: _ChordData('Em', ['E', 'G', 'B'], 'minor'),
       // #IV — tritone from tonic; used sparingly, adds Lydian sharpness
@@ -351,7 +397,17 @@ class ScaleMapper {
         ['G', 'B', 'D', 'F'],
         'dominant7',
       ),
-      ChordDegree.vi: _ChordData('Am', ['A', 'C', 'E'], 'minor'),
+      ChordDegree.vi: _ChordData(
+        'Am',
+        ['A', 'C', 'E'],
+        'minor',
+        'Am7',
+        ['A', 'C', 'E', 'G'],
+        'minor7',
+        'Am9',
+        ['A', 'C', 'E', 'G', 'B'],
+        'minor9',
+      ),
       ChordDegree.vii: _ChordData('Bm', ['B', 'D', 'F#'], 'minor'),
     },
 
@@ -426,6 +482,17 @@ class _ChordData {
   /// If null, the base [quality] is reused.
   final String? tensionQuality;
 
+  /// Chord name for 9th-chord (5-note) extension (e.g. "Cmaj9", "G9").
+  /// Only populated for the scales and degrees where a clean diatonic 9th
+  /// exists. Genre-driven: jazz, lo-fi, and R&B will trigger this tier.
+  final String? ninthVariant;
+
+  /// Five-note list for the ninth variant [root, 3rd, 5th, 7th, 9th].
+  final List<String>? ninthNotes;
+
+  /// Quality string for the ninth variant (e.g. "major9", "minor9", "dominant9").
+  final String? ninthQuality;
+
   const _ChordData(
     this.name,
     this.notes,
@@ -433,5 +500,8 @@ class _ChordData {
     this.tensionVariant,
     this.tensionNotes,
     this.tensionQuality,
+    this.ninthVariant,
+    this.ninthNotes,
+    this.ninthQuality,
   ]);
 }

@@ -45,19 +45,28 @@ class ChordNoteMapper {
 
   /// Returns octave-qualified note names for [chord] in close ascending voicing.
   ///
-  /// 7th chords (4 notes) are always rooted at octave 3 so all four tones
-  /// remain within the C3–B4 piano roll display range.
+  /// * Triads (3 notes): root octave determined by [_baseOctave].
+  /// * 7th chords (4 notes): always rooted at octave 3 so all four tones
+  ///   stay within the C3–B4 piano roll display range.
+  /// * 9th chords (5 notes): rooted at octave 3; the 9th (index 4) is
+  ///   always placed one octave higher than root (base + 1) to avoid a
+  ///   pitch-class comparison collision with the root's octave.
   static List<String> octaveNotes(Chord chord) {
     if (chord.notes.isEmpty) return const [];
     final root = chord.notes.first;
     final rootPc = _pitchClass(root);
-    // Force base=3 for 7th chords so the extra tension note stays in range
+    // 7th and 9th chords: root always in oct 3 so all notes fit in C3–B4
     final base = chord.notes.length >= 4 ? 3 : _baseOctave(root);
 
-    return chord.notes.map((n) {
-      final oct = _pitchClass(n) >= rootPc ? base : base + 1;
+    return List.generate(chord.notes.length, (i) {
+      final n = chord.notes[i];
+      // 9th (5th note, index 4) always placed at base+1 — it sits above the
+      // 7th regardless of pitch class, preventing wrap-around confusion.
+      final oct = (chord.notes.length >= 5 && i == 4)
+          ? base + 1
+          : (_pitchClass(n) >= rootPc ? base : base + 1);
       return '$n$oct';
-    }).toList();
+    });
   }
 
   /// Converts an entire [Progression] into a flat list of [PianoRollEvent]s.

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/app_spacing.dart';
+import '../../domain/entities/genre_type.dart';
 import '../viewmodels/progression_viewmodel.dart';
 import '../widgets/chord_chip.dart';
 import '../widgets/emotion_selector.dart';
@@ -78,7 +79,7 @@ class _OptionalFields extends StatelessWidget {
   });
 
   final ValueChanged<String> onKeyChanged;
-  final ValueChanged<String> onGenreChanged;
+  final ValueChanged<GenreType?> onGenreChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -103,13 +104,29 @@ class _OptionalFields extends StatelessWidget {
             ),
             AppSpacing.hGapMd,
             Expanded(
-              child: TextField(
+              child: DropdownButtonFormField<GenreType?>(
                 decoration: const InputDecoration(
-                  labelText: 'Genre (e.g. lo-fi)',
+                  labelText: 'Genre',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                 ),
+                value: null,
+                items: [
+                  const DropdownMenuItem(value: null, child: Text('None')),
+                  ...GenreType.values.map(
+                    (g) => DropdownMenuItem(
+                      value: g,
+                      child: Row(
+                        children: [
+                          Icon(g.icon, size: 16),
+                          const SizedBox(width: 6),
+                          Text(g.label),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
                 onChanged: onGenreChanged,
               ),
             ),

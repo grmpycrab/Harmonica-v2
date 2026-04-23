@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../core/providers/app_providers.dart';
 import '../../domain/entities/emotion_type.dart';
+import '../../domain/entities/genre_type.dart';
 import '../../domain/entities/progression.dart';
 import '../../domain/usecases/generate_progression_usecase.dart';
 
@@ -15,7 +16,7 @@ class ProgressionState {
     this.isLoading = false,
     this.error,
     this.key = '',
-    this.genre = '',
+    this.selectedGenre,
   });
 
   final EmotionType? selectedEmotion;
@@ -23,7 +24,7 @@ class ProgressionState {
   final bool isLoading;
   final String? error;
   final String key;
-  final String genre;
+  final GenreType? selectedGenre;
 
   ProgressionState copyWith({
     EmotionType? selectedEmotion,
@@ -31,7 +32,8 @@ class ProgressionState {
     bool? isLoading,
     String? error,
     String? key,
-    String? genre,
+    GenreType? selectedGenre,
+    bool clearGenre = false,
   }) {
     return ProgressionState(
       selectedEmotion: selectedEmotion ?? this.selectedEmotion,
@@ -39,7 +41,7 @@ class ProgressionState {
       isLoading: isLoading ?? this.isLoading,
       error: error,
       key: key ?? this.key,
-      genre: genre ?? this.genre,
+      selectedGenre: clearGenre ? null : (selectedGenre ?? this.selectedGenre),
     );
   }
 }
@@ -57,8 +59,13 @@ class ProgressionViewModel extends _$ProgressionViewModel {
     state = state.copyWith(key: key);
   }
 
-  void updateGenre(String genre) {
-    state = state.copyWith(genre: genre);
+  /// Sets the active genre. Pass [null] to return to emotion-only mode.
+  void updateGenre(GenreType? genre) {
+    if (genre == null) {
+      state = state.copyWith(clearGenre: true);
+    } else {
+      state = state.copyWith(selectedGenre: genre);
+    }
   }
 
   void generate() {
@@ -73,7 +80,7 @@ class ProgressionViewModel extends _$ProgressionViewModel {
       GenerateProgressionParams(
         emotion: emotion,
         key: state.key,
-        genre: state.genre,
+        genreType: state.selectedGenre,
       ),
     );
 

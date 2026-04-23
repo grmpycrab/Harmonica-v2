@@ -1,4 +1,5 @@
 import '../../domain/entities/emotion_type.dart';
+import '../../domain/entities/genre_type.dart';
 import '../../domain/entities/progression.dart';
 import 'progression_generator.dart';
 
@@ -17,9 +18,9 @@ class ChordGeneratorService {
   Progression generate({
     required EmotionType emotion,
     String key = '',
-    String genre = '',
+    GenreType? genreType,
   }) {
-    return _generator.generate(emotion: emotion, genre: genre);
+    return _generator.generate(emotion: emotion, genre: genreType);
   }
 
   Progression generateRandom() => _generator.generateRandom();

@@ -3,6 +3,8 @@ export 'entities/chord.dart';
 export 'entities/scale.dart';
 export 'entities/progression.dart';
 export 'entities/emotion_type.dart';
+export 'entities/genre_type.dart';
+export 'entities/genre_profile.dart';
 
 // Use cases
 export 'usecases/generate_progression_usecase.dart';
