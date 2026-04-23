@@ -136,9 +136,10 @@ class _ProgressionResult extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(
-                  progression.emotion.emoji,
-                  style: const TextStyle(fontSize: 22),
+                Icon(
+                  progression.emotion.icon,
+                  size: 18,
+                  color: theme.colorScheme.primary,
                 ),
                 AppSpacing.hGapSm,
                 Text(
@@ -178,17 +179,16 @@ class _ProgressionResult extends StatelessWidget {
             AppSpacing.gapSm,
             Text(
               progression.description,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.white60,
-                fontStyle: FontStyle.italic,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             if (progression.genre.isNotEmpty) ...[
               AppSpacing.gapSm,
               Text(
-                '# ${progression.genre}',
+                progression.genre,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.secondary,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
             ],

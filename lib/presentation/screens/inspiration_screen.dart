@@ -13,9 +13,10 @@ class InspirationScreen extends ConsumerWidget {
     final state = ref.watch(progressionViewModelProvider);
     final vm = ref.read(progressionViewModelProvider.notifier);
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Inspiration Mode')),
+      appBar: AppBar(title: const Text('Inspiration')),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
@@ -23,23 +24,16 @@ class InspirationScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Feeling stuck? Hit the button and get a random chord spark.',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: Colors.white70,
+                'Feeling stuck? Generate a random chord spark.',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
               AppSpacing.gapXl,
               ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFEA580C),
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                ),
                 onPressed: vm.generateRandom,
-                icon: const Text('⚡', style: TextStyle(fontSize: 20)),
-                label: const Text(
-                  'Spark Inspiration',
-                  style: TextStyle(fontSize: 16),
-                ),
+                icon: const Icon(Icons.shuffle_outlined, size: 18),
+                label: const Text('Spark Inspiration'),
               ),
               if (state.progression != null) ...[
                 AppSpacing.gapXl,
@@ -62,31 +56,44 @@ class _InspirationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final progression = state.progression!;
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           children: [
-            Text(
-              progression.emotion.emoji,
-              style: const TextStyle(fontSize: 48),
+            // Emotion icon in a tinted circle — clean, no emoji
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: colorScheme.primaryContainer,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                progression.emotion.icon,
+                size: 26,
+                color: colorScheme.primary,
+              ),
             ),
             AppSpacing.gapSm,
             Text(
               progression.emotion.label,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
             AppSpacing.gapMd,
             Text(
               progression.label,
               textAlign: TextAlign.center,
-              style: theme.textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: theme.colorScheme.primary,
-                letterSpacing: 2,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: colorScheme.onSurface,
+                letterSpacing: 2.5,
+                fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
             AppSpacing.gapMd,
@@ -94,17 +101,15 @@ class _InspirationCard extends StatelessWidget {
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.sm,
               alignment: WrapAlignment.center,
-              children: progression.chords
-                  .map((c) => ChordChip(chord: c))
-                  .toList(),
+              children:
+                  progression.chords.map((c) => ChordChip(chord: c)).toList(),
             ),
             AppSpacing.gapMd,
             Text(
               progression.description,
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.white60,
-                fontStyle: FontStyle.italic,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
           ],

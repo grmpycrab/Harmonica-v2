@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -30,8 +28,8 @@ class HomeScreen extends StatelessWidget {
               AppSpacing.gapMd,
               Text(
                 'What do you want to do today?',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: Colors.white70,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
               AppSpacing.gapXl,
@@ -39,23 +37,20 @@ class HomeScreen extends StatelessWidget {
                 icon: Icons.piano_outlined,
                 title: 'Chord Generator',
                 subtitle: 'Generate progressions by emotion or genre',
-                color: const Color(0xFF7C3AED),
                 onTap: () => context.push(AppConstants.routeGenerator),
               ),
               AppSpacing.gapMd,
               _HomeCard(
-                icon: Icons.bolt_outlined,
-                title: 'Inspiration Mode',
-                subtitle: 'Feeling stuck? Get a random spark',
-                color: const Color(0xFFEA580C),
+                icon: Icons.shuffle_outlined,
+                title: 'Inspiration',
+                subtitle: 'Get a random progression spark',
                 onTap: () => context.push(AppConstants.routeInspiration),
               ),
               AppSpacing.gapMd,
               _HomeCard(
-                icon: Icons.school_outlined,
+                icon: Icons.library_books_outlined,
                 title: 'Learn Theory',
-                subtitle: 'Chords, scales, progressions & more',
-                color: const Color(0xFF0891B2),
+                subtitle: 'Chords, scales, progressions and more',
                 onTap: () => context.push(AppConstants.routeLearn),
               ),
             ],
@@ -71,36 +66,35 @@ class _HomeCard extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.subtitle,
-    required this.color,
     required this.onTap,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
-  final Color color;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Card(
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Row(
             children: [
               Container(
-                width: 52,
-                height: 52,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
+                  color: colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(icon, color: color, size: 26),
+                child: Icon(icon, color: colorScheme.primary, size: 22),
               ),
               AppSpacing.hGapMd,
               Expanded(
@@ -117,13 +111,17 @@ class _HomeCard extends StatelessWidget {
                     Text(
                       subtitle,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.white54,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: Colors.white38),
+              Icon(
+                Icons.chevron_right,
+                color: colorScheme.onSurfaceVariant,
+                size: 18,
+              ),
             ],
           ),
         ),

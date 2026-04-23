@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 /// Represents the emotional character of a chord progression.
 ///
 /// Each value maps to an [EmotionProfile] in [EmotionCatalog] which
@@ -24,14 +26,15 @@ enum EmotionType {
         EmotionType.tense => 'Tense',
       };
 
-  String get emoji => switch (this) {
-        EmotionType.happy => '😊',
-        EmotionType.sad => '😢',
-        EmotionType.dark => '🌑',
-        EmotionType.hopeful => '🌅',
-        EmotionType.energetic => '⚡',
-        EmotionType.calm => '🌊',
-        EmotionType.nostalgic => '🎞️',
-        EmotionType.tense => '😤',
+  /// Material icon that represents this emotion — no emoji.
+  IconData get icon => switch (this) {
+        EmotionType.happy => Icons.wb_sunny_outlined,
+        EmotionType.sad => Icons.water_drop_outlined,
+        EmotionType.dark => Icons.nights_stay_outlined,
+        EmotionType.hopeful => Icons.filter_drama_outlined,
+        EmotionType.energetic => Icons.bolt_outlined,
+        EmotionType.calm => Icons.waves_outlined,
+        EmotionType.nostalgic => Icons.history_outlined,
+        EmotionType.tense => Icons.warning_amber_outlined,
       };
 }

@@ -1,10 +1,12 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/emotion_type.dart';
 
-/// A scrollable grid of emotion selection chips.
+/// A scrollable wrap of emotion selection chips.
+///
+/// Each chip renders a Material icon alongside the emotion label.
+/// Styling is driven entirely by the ambient [ChipThemeData] set in
+/// [AppTheme] — no hardcoded colours here.
 class EmotionSelector extends StatelessWidget {
   const EmotionSelector({
     super.key,
@@ -17,6 +19,8 @@ class EmotionSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Wrap(
       spacing: 8,
       runSpacing: 8,
@@ -24,20 +28,24 @@ class EmotionSelector extends StatelessWidget {
         final isSelected = emotion == selected;
         return FilterChip(
           selected: isSelected,
-          label: Text('${emotion.emoji} ${emotion.label}'),
+          avatar: Icon(
+            emotion.icon,
+            size: 15,
+            color:
+                isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+          ),
+          label: Text(emotion.label),
           onSelected: (_) => onSelect(emotion),
           showCheckmark: false,
-          selectedColor: Theme.of(
-            context,
-          ).colorScheme.primary.withOpacity(0.25),
+          selectedColor: colorScheme.primaryContainer,
           side: BorderSide(
-            color: isSelected
-                ? Theme.of(context).colorScheme.primary
-                : Colors.white24,
+            color: isSelected ? colorScheme.primary : colorScheme.outline,
           ),
           labelStyle: TextStyle(
-            color: isSelected ? Colors.white : Colors.white70,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            color:
+                isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+            fontSize: 13,
           ),
         );
       }).toList(),
