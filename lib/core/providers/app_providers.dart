@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../data/datasources/theory_local_datasource.dart';
@@ -10,6 +12,13 @@ import '../../domain/usecases/generate_progression_usecase.dart';
 import '../../domain/usecases/get_theory_lesson_usecase.dart';
 
 part 'app_providers.g.dart';
+
+// ---------------------------------------------------------------------------
+// Theme — plain StateProvider, no code generation required
+// ---------------------------------------------------------------------------
+
+/// Controls app-wide light / dark mode. Defaults to dark.
+final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.dark);
 
 // ---------------------------------------------------------------------------
 // Services — innermost layer, no dependencies on other providers
